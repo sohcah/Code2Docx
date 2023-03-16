@@ -1,5 +1,11 @@
 # CodeToDoc
 
+![Example Document](example.png)
+
+CodeToDoc is a tool that generates Word documents from code.
+
+It uses [Shiki](https://shiki.matsu.io/) for Syntax Highlighting, and [Docx](https://docx.js.org/) for generating the Word document.
+
 ### Install
 
 ```bash
