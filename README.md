@@ -39,6 +39,15 @@ An example is below:
     ["xml", "xml"],
     ["/yarn\\.lock$/", "yaml"]
   ],
-  "tabWidth": 4
+  "tabWidth": 4,
+  "continuous": true,
+  "heading": {
+    "font": "Consolas",
+    "type": "heading1"
+  },
+  "code": {
+    "font": "JetBrains Mono",
+    "size": 12
+  }
 }
 ```

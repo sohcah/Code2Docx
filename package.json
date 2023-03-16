@@ -2,11 +2,14 @@
   "name": "@sohcah/code-to-doc",
   "packageManager": "yarn@3.4.1",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --external color,docx,ignore-walk,istextorbinary,shiki,zod"
+    "build": "tsup src/index.ts --format cjs,esm --dts --external color,docx,ignore-walk,istextorbinary,shiki,zod",
+    "start": "yarn build && node dist/index.cjs"
   },
   "dependencies": {
+    "chalk": "^5.2.0",
+    "chalk-template": "^0.5.0",
     "color": "^4.2.3",
     "docx": "^7.8.2",
     "ignore-walk": "^6.0.1",

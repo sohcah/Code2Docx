@@ -8,6 +8,33 @@ import Color from "color";
 import {z} from "zod";
 import {isText} from "istextorbinary";
 
+const configSchema = z.object({
+	fileTypes: z.tuple([
+		z.string(),
+		z.string().optional(),
+	]).array().default([]),
+	shikiTheme: z.string().default("light-plus"),
+	tabWidth: z.number().default(2),
+	continuous: z.boolean().default(true),
+	heading: z.object({
+		font: z.string().default("Calibri Light"),
+		type: z.enum([
+			"heading1",
+			"heading2",
+			"heading3",
+			"heading4",
+			"heading5",
+			"heading6",
+		]).default("heading1"),
+	}).default({}),
+	code: z.object({
+		font: z.string().default("Consolas"),
+		size: z.number().default(11),
+	}).default({}),
+}).default({});
+
+const defaultConfig = configSchema.parse(undefined);
+
 const directory = process.argv[2] ?? process.cwd();
 
 async function run() {
@@ -38,16 +65,22 @@ async function run() {
 	const configFilePath = resolve(directory, ".codetodoc.json");
 	const configFile = fs.existsSync(configFilePath) ? JSON.parse(fs.readFileSync(configFilePath, "utf8")) : undefined;
 
-	const config = z.object({
-		fileTypes: z.tuple([
-			z.string(),
-			z.string().optional(),
-		]).array().default([]),
-		shikiTheme: z.string().default("light-plus"),
-		tabWidth: z.number().default(2),
-	}).default({}).parse(configFile);
+	const config = configSchema.parse(configFile);
 
-	console.log("Config:", config);
+	const chalk = (await import("chalk-template")).default;
+
+console.log(chalk`
+{yellow.underline Config}
+{${defaultConfig.shikiTheme === config.shikiTheme ? "gray" : "blue"} Theme: ${config.shikiTheme}}
+{${defaultConfig.tabWidth === config.tabWidth ? "gray" : "blue"} Tab width: ${config.tabWidth}}
+{${defaultConfig.continuous === config.continuous ? "gray" : "blue"} Continuous: ${config.continuous}}
+{gray Heading: }
+{${defaultConfig.heading.font === config.heading.font ? "gray" : "blue"}   Font: ${config.heading.font}}
+{${defaultConfig.heading.type === config.heading.type ? "gray" : "blue"}   Type: ${config.heading.type}}
+{gray Code: }
+{${defaultConfig.code.font === config.code.font ? "gray" : "blue"}   Font: ${config.code.font}}
+{${defaultConfig.code.size === config.code.size ? "gray" : "blue"}   Size: ${config.code.size}}
+`.trim())
 
 	const fileMappings: [RegExp, string | undefined][] = [
 		...config.fileTypes.map(([regex, language]) => [regex.startsWith("/") ? new RegExp(regex.slice(1, -1)) : new RegExp(`\\.${regex}$`), language] as [RegExp, string | undefined]),
@@ -69,6 +102,7 @@ async function run() {
 		theme: config.shikiTheme,
 	});
 
+	let fileIndex = 0;
 	for (const file of files) {
 		if (!isText(file)) {
 			console.log("Skipping binary file", file);
@@ -80,6 +114,7 @@ async function run() {
 		const tokens = highlighter.codeToThemedTokens(fileContent, fileMapping?.[1]);
 		sections.push({
 			properties: {
+				type: config.continuous ? docx.SectionType.CONTINUOUS : undefined,
 				page: {
 					margin: {
 						top: 720,
@@ -92,8 +127,23 @@ async function run() {
 			children: [
 				// title
 				new docx.Paragraph({
-					text: file,
-					heading: docx.HeadingLevel.HEADING_1,
+					children: [
+						new docx.TextRun({
+							text: file,
+							font: {
+								name: config.heading.font,
+							},
+							break: config.continuous && fileIndex !== 0 ? 1 : 0,
+						})
+					],
+					heading: docx.HeadingLevel[{
+						heading1: "HEADING_1" as const,
+						heading2: "HEADING_2" as const,
+						heading3: "HEADING_3" as const,
+						heading4: "HEADING_4" as const,
+						heading5: "HEADING_5" as const,
+						heading6: "HEADING_6" as const,
+					}[config.heading.type]],
 				}),
 				// code
 				new docx.Paragraph({
@@ -102,27 +152,27 @@ async function run() {
 						color: Color(highlighter.getBackgroundColor()).hex(),
 					},
 					children: [
-						...tokens
-							.flatMap((line, lineIndex) => (
-									line.map((token, index) => (
-											new docx.TextRun({
-												text: token.content.replace(/\t/g, " ".repeat(config.tabWidth)),
-												color: token.color ? Color(token.color)
-													.hex() : Color(highlighter.getForegroundColor()).hex(),
-												break: index === 0 && lineIndex !== 0 ? 1 : 0,
-												font: {
-													name: "Consolas",
-												},
-											})
-										)
+						...tokens.flatMap((line, lineIndex) => (
+								line.map((token, index) => (
+										new docx.TextRun({
+											text: token.content.replace(/\t/g, " ".repeat(config.tabWidth)),
+											color: token.color ? Color(token.color)
+												.hex() : Color(highlighter.getForegroundColor()).hex(),
+											break: index === 0 && lineIndex !== 0 ? 1 : 0,
+											font: {
+												name: config.code.font,
+											},
+											size: config.code.size * 2,
+										})
 									)
 								)
 							)
+						)
 					],
 				}),
 			],
 		});
-
+		fileIndex++;
 	}
 	const doc = new docx.Document({
 		sections,
