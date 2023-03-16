@@ -33,6 +33,15 @@ const configSchema = z.object({
 	}).default({}),
 }).default({});
 
+if (process.argv[2] === "--help") {
+	console.log(`
+Usage: code2docx [directory]
+
+For more information on configuration, see https://github.com/sohcah/code2docx
+`.trim());
+	process.exit(0);
+}
+
 const defaultConfig = configSchema.parse(undefined);
 
 const directory = process.argv[2] ?? process.cwd();
@@ -40,36 +49,36 @@ const directory = process.argv[2] ?? process.cwd();
 async function run() {
 
 
-	fs.writeFileSync(resolve(directory, ".tmp_codetodocignore"), `
+	fs.writeFileSync(resolve(directory, ".tmp_code2docxignore"), `
 .git/
 .gitattributes
 .gitignore
-.codetodocignore
-.codetodoc.json
-.tmp_codetodocignore
+.code2docxignore
+.code2docx.json
+.tmp_code2docxignore
 *.docx
 .DS_Store
 `)
 
 	const files = walk.sync({
 		path: directory,
-		ignoreFiles: [".gitignore", ".codetodocignore", ".tmp_codetodocignore"],
+		ignoreFiles: [".gitignore", ".code2docxignore", ".tmp_code2docxignore"],
 	})
 
-	fs.rmSync(resolve(directory, ".tmp_codetodocignore"))
+	fs.rmSync(resolve(directory, ".tmp_code2docxignore"))
 
 	console.info(`Found ${files.length} files in ${directory}`);
 
 	const sections: docx.ISectionOptions[] = [];
 
-	const configFilePath = resolve(directory, ".codetodoc.json");
+	const configFilePath = resolve(directory, ".code2docx.json");
 	const configFile = fs.existsSync(configFilePath) ? JSON.parse(fs.readFileSync(configFilePath, "utf8")) : undefined;
 
 	const config = configSchema.parse(configFile);
 
 	const chalk = (await import("chalk-template")).default;
 
-console.log(chalk`
+	console.log(chalk`
 {yellow.underline Config}
 {${defaultConfig.shikiTheme === config.shikiTheme ? "gray" : "blue"} Theme: ${config.shikiTheme}}
 {${defaultConfig.tabWidth === config.tabWidth ? "gray" : "blue"} Tab width: ${config.tabWidth}}
@@ -153,19 +162,25 @@ console.log(chalk`
 					},
 					children: [
 						...tokens.flatMap((line, lineIndex) => (
-								line.map((token, index) => (
+								line.length === 0 ? [
 										new docx.TextRun({
-											text: token.content.replace(/\t/g, " ".repeat(config.tabWidth)),
-											color: token.color ? Color(token.color)
-												.hex() : Color(highlighter.getForegroundColor()).hex(),
-											break: index === 0 && lineIndex !== 0 ? 1 : 0,
-											font: {
-												name: config.code.font,
-											},
-											size: config.code.size * 2,
+											text: "",
+											break: 1,
 										})
+									] :
+									line.map((token, index) => (
+											new docx.TextRun({
+												text: token.content.replace(/\t/g, " ".repeat(config.tabWidth)),
+												color: token.color ? Color(token.color)
+													.hex() : Color(highlighter.getForegroundColor()).hex(),
+												break: index === 0 && lineIndex !== 0 ? 1 : 0,
+												font: {
+													name: config.code.font,
+												},
+												size: config.code.size * 2,
+											})
+										)
 									)
-								)
 							)
 						)
 					],
@@ -178,10 +193,10 @@ console.log(chalk`
 		sections,
 	});
 
-	console.log("Writing codetodoc.docx...");
+	console.log("Writing code2docx.docx...");
 
 	const buffer = await docx.Packer.toBuffer(doc)
-	fs.writeFileSync(resolve(directory, "codetodoc.docx"), buffer);
+	fs.writeFileSync(resolve(directory, "code2docx.docx"), buffer);
 
 	console.log("Done!");
 

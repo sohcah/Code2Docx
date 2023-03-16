@@ -243,29 +243,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sohcah/code-to-doc@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@sohcah/code-to-doc@workspace:."
-  dependencies:
-    "@types/color": ^3.0.3
-    "@types/ignore-walk": ^4.0.0
-    chalk: ^5.2.0
-    chalk-template: ^0.5.0
-    color: ^4.2.3
-    docx: ^7.8.2
-    ignore-walk: ^6.0.1
-    istextorbinary: ^6.0.0
-    shiki: ^0.14.1
-    tslib: ^2.5.0
-    tsup: ^6.6.3
-    tsx: ^3.12.5
-    typescript: ^4.9.5
-    zod: ^3.21.4
-  bin:
-    code-to-doc: dist/index.cjs
-  languageName: unknown
-  linkType: soft
-
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -573,6 +550,29 @@ __metadata:
   checksum: 2ac8cd2b2f5ec986a3c743935ec85b07bc174d5421a5efc8017e1f146a1cf5f781ae962618f416352103b32c9cd7e203276e8c28241bbe946160cab16149fb68
   languageName: node
   linkType: hard
+
+"code2docx@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "code2docx@workspace:."
+  dependencies:
+    "@types/color": ^3.0.3
+    "@types/ignore-walk": ^4.0.0
+    chalk: ^5.2.0
+    chalk-template: ^0.5.0
+    color: ^4.2.3
+    docx: ^7.8.2
+    ignore-walk: ^6.0.1
+    istextorbinary: ^6.0.0
+    shiki: ^0.14.1
+    tslib: ^2.5.0
+    tsup: ^6.6.3
+    tsx: ^3.12.5
+    typescript: ^4.9.5
+    zod: ^3.21.4
+  bin:
+    code2docx: dist/index.cjs
+  languageName: unknown
+  linkType: soft
 
 "color-convert@npm:^2.0.1":
   version: 2.0.1

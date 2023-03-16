@@ -1,34 +1,34 @@
-# CodeToDoc
+# Code2Docx
 
 ![Example Document](example.png)
 
-CodeToDoc is a tool that generates Word documents from code.
+Code2Docx is a tool that generates Word documents from code.
 
 It uses [Shiki](https://shiki.matsu.io/) for Syntax Highlighting, and [Docx](https://docx.js.org/) for generating the Word document.
 
 ### Install
 
 ```bash
-npm i -g @sohcah/code-to-doc
+npm i -g code2docx
 ```
 
 ### Usage
 
 ```bash
-code-to-doc [folder]
+code2docx [folder]
 ```
 
 ### Configuration
 
 #### Ignore Files
 
-CodeToDoc will ignore all files listed in your `.gitignore`.
+Code2Docx will ignore all files listed in your `.gitignore`.
 
-If you want to ignore files only for CodeToDoc, you can create a `.codetodocignore` file with the same syntax as a `.gitignore`.
+If you want to ignore files only for Code2Docx, you can create a `.code2docxignore` file with the same syntax as a `.gitignore`.
 
 #### Other Configuration
 
-You can create a `.codetodoc.json` configuration file in your project root.
+You can create a `.code2docx.json` configuration file in your project root.
 
 An example is below:
 
