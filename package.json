@@ -1,10 +1,25 @@
 {
-  "name": "code-to-doc",
+  "name": "@sohcah/code-to-doc",
   "packageManager": "yarn@3.4.1",
-  "dependencies": {
-    "docx": "^7.8.2"
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external color,docx,ignore-walk,istextorbinary,shiki,zod"
   },
+  "dependencies": {
+    "color": "^4.2.3",
+    "docx": "^7.8.2",
+    "ignore-walk": "^6.0.1",
+    "istextorbinary": "^6.0.0",
+    "shiki": "^0.14.1",
+    "tslib": "^2.5.0",
+    "zod": "^3.21.4"
+  },
+  "bin": "dist/index.cjs",
   "devDependencies": {
+    "@types/color": "^3.0.3",
+    "@types/ignore-walk": "^4.0.0",
+    "tsup": "^6.6.3",
     "tsx": "^3.12.5",
     "typescript": "^4.9.5"
   }

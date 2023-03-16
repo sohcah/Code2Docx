@@ -6,3 +6,7 @@
 !.yarn/versions
 
 node_modules
+.idea/
+dist/
+
+*.docx
