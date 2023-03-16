@@ -79,6 +79,16 @@ async function run() {
 		const fileMapping = fileMappings.find(([regex]) => regex.test(file));
 		const tokens = highlighter.codeToThemedTokens(fileContent, fileMapping?.[1]);
 		sections.push({
+			properties: {
+				page: {
+					margin: {
+						top: 720,
+						right: 720,
+						bottom: 720,
+						left: 720,
+					}
+				}
+			},
 			children: [
 				// title
 				new docx.Paragraph({
