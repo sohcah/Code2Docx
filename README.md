@@ -17,7 +17,8 @@ code-to-doc [folder]
 #### Ignore Files
 
 CodeToDoc will ignore all files listed in your `.gitignore`.
-It also supports custom ignore files. Just create a `.codetodocignore` file.
+
+If you want to ignore files only for CodeToDoc, you can create a `.codetodocignore` file with the same syntax as a `.gitignore`.
 
 #### Other Configuration
 
