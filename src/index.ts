@@ -128,10 +128,10 @@ async function run() {
 		sections,
 	});
 
-	console.log("Writing output.docx...");
+	console.log("Writing codetodoc.docx...");
 
 	const buffer = await docx.Packer.toBuffer(doc)
-	fs.writeFileSync(resolve(directory, "output.docx"), buffer);
+	fs.writeFileSync(resolve(directory, "codetodoc.docx"), buffer);
 
 	console.log("Done!");
 
