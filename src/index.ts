@@ -115,7 +115,7 @@ async function run() {
 	let fileIndex = 0;
 	for (const file of files) {
 		if (!isText(file)) {
-			if (!await new Promise(resolve => {
+			if (await new Promise(resolve => {
 				const rl = readline.createInterface({
 					input: process.stdin,
 					output: process.stdout,
