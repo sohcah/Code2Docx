@@ -7,6 +7,7 @@ import shiki from "shiki";
 import Color from "color";
 import {z} from "zod";
 import {isText} from "istextorbinary";
+import readline from "readline";
 
 const configSchema = z.object({
 	fileTypes: z.tuple([
@@ -114,8 +115,19 @@ async function run() {
 	let fileIndex = 0;
 	for (const file of files) {
 		if (!isText(file)) {
-			console.log("Skipping binary file", file);
-			continue;
+			if (!await new Promise(resolve => {
+				const rl = readline.createInterface({
+					input: process.stdin,
+					output: process.stdout,
+				});
+				rl.question(`Skip possibly binary file ${file}? (y/n) `, (answer: string) => {
+					resolve(answer === "y");
+					rl.close();
+				});
+			})) {
+				console.log("Skipping binary file", file);
+				continue;
+			}
 		}
 		console.log(`Processing ${file}...`);
 		const fileContent = fs.readFileSync(resolve(directory, file), "utf8");
