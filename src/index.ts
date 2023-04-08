@@ -12,7 +12,7 @@ import readline from "readline";
 const configSchema = z.object({
 	fileTypes: z.tuple([
 		z.string(),
-		z.string().optional(),
+		z.string().optional().or(z.record(z.any())),
 	]).array().default([]),
 	shikiTheme: z.string().default("light-plus"),
 	tabWidth: z.number().default(2),
@@ -92,8 +92,23 @@ async function run() {
 {${defaultConfig.code.size === config.code.size ? "gray" : "blue"}   Size: ${config.code.size}}
 `.trim())
 
-	const fileMappings: [RegExp, string | undefined][] = [
-		...config.fileTypes.map(([regex, language]) => [regex.startsWith("/") ? new RegExp(regex.slice(1, -1)) : new RegExp(`\\.${regex}$`), language] as [RegExp, string | undefined]),
+	const initialFileMappings: [RegExp, string | { id: string; scopeName: string; path: string; } | undefined][] = [
+		...config.fileTypes.map(([regex, language]) => {
+			const parsedRegex = regex.startsWith("/") ? new RegExp(regex.slice(1, -1)) : new RegExp(`\\.${regex}$`);
+			if (language && typeof language === "object") {
+				const id = `code2docx-${Math.random().toString(36).slice(2)}`;
+				return [parsedRegex, {
+					id,
+					scopeName: language.scopeName,
+					path: resolve(process.cwd(), language.path),
+				}] as [RegExp, {
+					id: string;
+					scopeName: string;
+					path: string;
+				}];
+			}
+			return [parsedRegex, language] as [RegExp, string | undefined];
+		}),
 		[/\.jsx?$/, "javascript"],
 		[/\.tsx?$/, "typescript"],
 		[/\.json$/, "json"],
@@ -110,6 +125,21 @@ async function run() {
 
 	const highlighter = await shiki.getHighlighter({
 		theme: config.shikiTheme,
+		langs: [
+			...shiki.BUNDLED_LANGUAGES,
+			...initialFileMappings.filter(i => typeof i[1] !== "string").map(i => i[1]) as {
+				id: string;
+				scopeName: string;
+				path: string;
+			}[]
+		],
+	});
+
+	const fileMappings = initialFileMappings.map(([regex, language]) => {
+		if (!language || typeof language === "string") {
+			return [regex, language] as [RegExp, string];
+		}
+		return [regex, language.id] as [RegExp, string | undefined];
 	});
 
 	let fileIndex = 0;

@@ -39,7 +39,14 @@ An example is below:
   "shikiTheme": "nord",
   "fileTypes": [
     ["xml", "xml"],
-    ["/yarn\\.lock$/", "yaml"]
+    ["/yarn\\.lock$/", "yaml"],
+    [
+      "overpassql",
+      {
+        "scopeName": "source.overpass",
+        "path": "./overpassql.json"
+      }
+    ]
   ],
   "tabWidth": 4,
   "continuous": true,

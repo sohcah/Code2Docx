@@ -2,7 +2,7 @@
   "name": "code2docx",
   "packageManager": "yarn@3.4.1",
   "type": "module",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --external color,docx,ignore-walk,istextorbinary,shiki,zod",
     "start": "yarn build && node dist/index.cjs"
